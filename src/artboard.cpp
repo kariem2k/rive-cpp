@@ -1,4 +1,5 @@
 #include "rive/artboard.hpp"
+#include "rive/backboard.hpp"
 #include "rive/animation/animation.hpp"
 #include "rive/dependency_sorter.hpp"
 #include "rive/draw_rules.hpp"
@@ -8,6 +9,8 @@
 #include "rive/node.hpp"
 #include "rive/renderer.hpp"
 #include "rive/shapes/paint/shape_paint.hpp"
+#include "rive/importers/import_stack.hpp"
+#include "rive/importers/backboard_importer.hpp"
 #include <unordered_map>
 
 using namespace rive;
@@ -546,4 +549,25 @@ Artboard* Artboard::instance() const
 	artboardClone->m_IsInstance = true;
 
 	return artboardClone;
+}
+
+StatusCode Artboard::import(ImportStack& importStack)
+{
+	auto backboardImporter =
+	    importStack.latest<BackboardImporter>(Backboard::typeKey);
+	if (backboardImporter == nullptr)
+	{
+		return StatusCode::MissingObject;
+	}
+
+	StatusCode result = Super::import(importStack);
+	if (result == StatusCode::Ok)
+	{
+		backboardImporter->addArtboard(this);
+	}
+	else
+	{
+		backboardImporter->addMissingArtboard();
+	}
+	return result;
 }

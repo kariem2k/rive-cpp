@@ -99,6 +99,8 @@ namespace rive
 
 		/// Returns true if the artboard is an instance of another
 		bool isInstance() const { return m_IsInstance; }
+
+		StatusCode import(ImportStack& importStack) override;
 	};
 } // namespace rive
 
